@@ -1,10 +1,11 @@
 const WebSocket = require("ws");
 
-const users = new Set();
-
 const server = new WebSocket.Server({ port: 8081 }, () =>
 	console.log("Server running on port 8081."),
 );
+
+const users = new Set();
+const recentMessages = [];
 
 const sendMessage = (message) => {
 	for (const user of users) {
@@ -28,6 +29,14 @@ server.on("connection", (socket) => {
 				return;
 			}
 
+			const senderRecentMessages = recentMessages.filter(
+				(message) => message.sender === parsedMessage.sender,
+			).length;
+			if (senderRecentMessages === 30) {
+				socket.close(4000, "flooding the chat");
+				return;
+			}
+
 			const verifiedMessage = {
 				sender: parsedMessage.sender,
 				body: parsedMessage.body,
@@ -35,6 +44,7 @@ server.on("connection", (socket) => {
 			};
 
 			sendMessage(verifiedMessage);
+			recentMessages.push(verifiedMessage);
 			userRef.lastActiveAt = Date.now();
 		} catch (error) {
 			console.error("Error parsing message.", error);
