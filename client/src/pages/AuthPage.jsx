@@ -1,14 +1,14 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 export const AuthPage = () => {
 	const navigate = useNavigate();
-	const [name, setName] = useState('');
+	const [name, setName] = useState("");
 
 	const logOn = () => {
-		if (name !== '') navigate(`/chat/${name}`)
-		else alert("We need a name!")
-	}
+		if (name !== "") navigate(`/chat/${name}`);
+		else alert("We need a name!");
+	};
 
 	return (
 		<main className='simple-wrapper'>
@@ -18,7 +18,17 @@ export const AuthPage = () => {
 			</p>
 
 			<div className='simple-section'>
-				<input aria-labelledby='name-label' type='text' autoComplete='name' placeholder='Your username' value={name} onChange={(event) => setName(event.target.value)} onkeyPress={(event) => { if (event.key === 'Enter') logOn()}} />
+				<input
+					aria-labelledby='name-label'
+					type='text'
+					autoComplete='name'
+					placeholder='Your username'
+					value={name}
+					onChange={(event) => setName(event.target.value)}
+					onkeyPress={(event) => {
+						if (event.key === "Enter") logOn();
+					}}
+				/>
 			</div>
 
 			<div className='simple-section'>
@@ -27,3 +37,4 @@ export const AuthPage = () => {
 		</main>
 	);
 };
+
