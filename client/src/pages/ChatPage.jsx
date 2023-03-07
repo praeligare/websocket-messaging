@@ -10,9 +10,39 @@ const sendIcon = (
 export const ChatPage = () => {
 	const navigate = useNavigate();
 	const { name } = useParams();
+	const [messages, setMessages] = useState([]);
 
 	return (
 		<main className='chat-wrapper'>
+			<header className='chat-header'>
+				<h1>WS channel</h1>
+			</header>
+
+			<div className='chat-view-container'>
+				{messages.map((message) => (
+					<article key={message.sentAt} className={'message-container' + (message.sender === name ? ' own message' : '')}>
+						<header className='message-header'>
+							<h4 className='message-sender'>{message.sender === name ? 'You' : message.sender}</h4>
+							<span className='messag-time'>
+								{new Date(message.sentAt).toLocaleTimeString(undefined, { timeStyle: 'short' })}
+							</span>
+						</header>
+						<p className='message-body'>{message.body}</p>
+					</article>
+				))}
+			</div>
+
+			<footer className='message-input-container'>
+				<p className='chatting-as'>You're posting as "{name}".</p>
+
+				<div className='message-input-container-inner'>
+					<input autoFocus aria-label='Type a message' placeholder='Type a message' type='text' autoComplete='off' />
+
+					<button aria-label='Send' className='icon-button'>
+						{sendIcon}
+					</button>
+				</div>
+			</footer>
 		</main>
 	);
 };
