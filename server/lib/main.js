@@ -15,7 +15,9 @@ const sendMessage = (message) => {
 server.on("connection", (socket) => {
 	const userRef = {
 		socket: socket,
+		lastActiveAt: Date.now(),
 	};
+
 	users.add(userRef);
 
 	socket.on("message", (message) => {
@@ -33,6 +35,7 @@ server.on("connection", (socket) => {
 			};
 
 			sendMessage(verifiedMessage);
+			userRef.lastActiveAt = Date.now();
 		} catch (error) {
 			console.error("Error parsing message.", error);
 		}
@@ -42,5 +45,15 @@ server.on("connection", (socket) => {
 		console.log(`User disconnected. Code: ${code}, reason: ${reason}.`);
 		users.delete(userRef);
 	});
+
+	setInterval(() => {
+		const now = Date.now();
+
+		for (const user in users) {
+			if (now - user.lastActiveAt > 300000) {
+				user.socket.close(4000, "inactivity");
+			}
+		}
+	}, 10000);
 });
 
