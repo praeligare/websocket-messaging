@@ -8,14 +8,21 @@ const sendIcon = (
 );
 
 export const ChatPage = () => {
-	const navigate = useNavigate();
-	const { name } = useParams();
 	const ws = useRef();
+	const { name } = useParams();
+	const navigate = useNavigate();
+	const scrollTarget = useRef(null);
 	const [messages, setMessages] = useState([]);
 	const [messageBody, setMessageBody] = useState("");
+	const [connectionOpen, setConnectionOpen] = useState(false);
 
 	useEffect(() => {
 		ws.current = new WebSocket("ws://localhost:8081");
+
+		ws.current.onopen = () => {
+			console.log("Connection opened.");
+			setConnectionOpen(true);
+		};
 
 		// todo fix this
 		ws.current.onmessage = (event) => {
@@ -33,6 +40,12 @@ export const ChatPage = () => {
 			ws.current.close();
 		};
 	}, []);
+
+	useEffect(() => {
+		if (scrollTarget.current) {
+			scrollTarget.current.scrollIntoView({ behavior: "smooth" });
+		}
+	}, [messages.length]);
 
 	const send = () => {
 		if (messageBody === "") return;
@@ -60,6 +73,8 @@ export const ChatPage = () => {
 						<p className='message-body'>{message.body}</p>
 					</article>
 				))}
+
+				<div ref={scrollTarget} />
 			</div>
 
 			<footer className='message-input-container'>
@@ -79,7 +94,11 @@ export const ChatPage = () => {
 						}}
 					/>
 
-					<button aria-label='Send' className='icon-button' onClick={send}>
+					<button
+						aria-label='Send'
+						className='icon-button'
+						onClick={send}
+						disabled={!connectionOpen}>
 						{sendIcon}
 					</button>
 				</div>
